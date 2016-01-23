@@ -1,3 +1,5 @@
+import java.text.DecimalFormat;
+
 public class Vector {
 
     private double[] data;
@@ -49,6 +51,23 @@ public class Vector {
         return new Vector(answer);
     }
 
+    public String magnitude() {
+        double num = 0;
+        for (double dat : data) {
+            num += (dat * dat);
+        }
+        double bum = Math.sqrt(num);
+        return new DecimalFormat("##0.##E0").format(bum);
+    }
+
+    public Vector unitVector() {
+        double[] din = new double[size];
+        for (int i = 0; i < size; i++) {
+            din[i] = data[i] / Double.valueOf(magnitude());
+        }
+        return new Vector(din);
+    }
+
     public double[] getData() {
         return data;
     }
@@ -61,7 +80,8 @@ public class Vector {
     public String toString() {
         String vec = "<";
         for (double tin : data) {
-            vec = vec + Double.toString(tin) + ", ";
+
+            vec = vec + new DecimalFormat("##0.##E0").format(tin) + ", ";
         }
         vec = vec.substring(0, vec.length() - 2);
         vec += ">";
