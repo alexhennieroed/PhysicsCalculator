@@ -1,7 +1,7 @@
 # PhysicsCalculator
 This application can calculate physics equations
 
-### Current Capabilities
+### Included Equations
 - Adding and subtracting vectors
 - Vector magnitude and unit vector
 - Momentum (relativistic, nonrelativistic, and impulse)
