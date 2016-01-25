@@ -1,9 +1,14 @@
+import com.sun.media.sound.MidiUtils;
+import com.sun.prism.GraphicsResource;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+
+import javax.swing.text.html.HTML;
+import javax.swing.text.html.HTMLWriter;
 
 public class CalcScenes {
 
@@ -18,15 +23,16 @@ public class CalcScenes {
         name.setFont(new Font(35));
         Label instr = new Label("Select an equation type on the left to get started");
         instr.setFont(new Font(25));
+        Label test = new Label();
         UserInterface.data.getChildren().clear();
-        UserInterface.data.getChildren().addAll(hello, name, instr);
+        UserInterface.data.getChildren().addAll(hello, name, instr, test);
         UserInterface.data.setAlignment(Pos.CENTER);
     }
 
     public static void magnitude() {
         UserInterface.data.getChildren().clear();
         TextField vector1 = new TextField();
-        vector1.setPromptText("<x,y,z>");
+        vector1.setPromptText("Vector <x,y,z>");
         pasteTo = vector1;
         Button mag = new Button("MAGNITUDE");
         mag.setOnAction(event -> {
@@ -43,7 +49,7 @@ public class CalcScenes {
     public static void unitVector() {
         UserInterface.data.getChildren().clear();
         TextField vector1 = new TextField();
-        vector1.setPromptText("<x,y,z>");
+        vector1.setPromptText("Vector <x,y,z>");
         pasteTo = vector1;
         Button unit = new Button("Unit Vector");
         unit.setOnAction(event -> {
@@ -58,15 +64,15 @@ public class CalcScenes {
     public static void vectorAddition() {
         UserInterface.data.getChildren().clear();
         TextField vector1 = new TextField();
-        vector1.setPromptText("<x,y,z>");
+        vector1.setPromptText("Vector <x,y,z>");
         vector1.setOnMouseClicked(event -> pasteTo = vector1);
         TextField vector2 = new TextField();
-        vector2.setPromptText("<x,y,z>");
+        vector2.setPromptText("Vector <x,y,z>");
         vector2.setOnMouseClicked(event -> pasteTo = vector2);
         Button add = new Button("ADD");
         add.setOnAction(event -> {
             String answer = Calculations.vectorAddition(vector1.getText(),
-                vector2.getText()).toString();
+                vector2.getText());
             String v1 = vector1.getText();
             String v2 = vector2.getText();
             Label prob = new Label(v1 + " + " + v2 + " =");
@@ -80,15 +86,15 @@ public class CalcScenes {
     public static void vectorSubtraction() {
         UserInterface.data.getChildren().clear();
         TextField vector1 = new TextField();
-        vector1.setPromptText("<x,y,z>");
+        vector1.setPromptText("Vector <x,y,z>");
         vector1.setOnMouseClicked(event -> pasteTo = vector1);
         TextField vector2 = new TextField();
-        vector2.setPromptText("<x,y,z>");
+        vector2.setPromptText("Vector <x,y,z>");
         vector2.setOnMouseClicked(event -> pasteTo = vector2);
         Button sub = new Button("SUBTRACT");
         sub.setOnAction(event -> {
             String answer = Calculations.vectorSubtraction(vector1.getText(),
-                vector2.getText()).toString();
+                vector2.getText());
             String v1 = vector1.getText();
             String v2 = vector2.getText();
             Label prob = new Label(v1 + " - " + v2 + " =");
@@ -102,7 +108,7 @@ public class CalcScenes {
     public static void scalarMultiplication() {
         UserInterface.data.getChildren().clear();
         TextField vector1 = new TextField();
-        vector1.setPromptText("<x,y,z>");
+        vector1.setPromptText("Vector <x,y,z>");
         vector1.setOnMouseClicked(event -> pasteTo = vector1);
         TextField scalar = new TextField();
         scalar.setPromptText("scalar");
@@ -127,21 +133,44 @@ public class CalcScenes {
         vector1.setPromptText("Velocity <x,y,z>");
         vector1.setOnMouseClicked(event -> pasteTo = vector1);
         TextField mass = new TextField();
-        mass.setPromptText("mass");
+        mass.setPromptText("mass(kg)");
         mass.setOnMouseClicked(event -> pasteTo = mass);
+        TextField momentum = new TextField();
+        momentum.setPromptText("Momentum <x,y,z>");
+        momentum.setOnMouseClicked(event -> pasteTo = mass);
         Button calc = new Button("CALCULATE");
         calc.setOnAction(event -> {
-            String answer = Calculations.relativisticMomentum(vector1.getText(),
-                    mass.getText()).toString();
-            String vel = vector1.getText();
-            String ma = mass.getText();
-            Label form = new Label("p=" + GreekLetters.GAMMA + "mv");
-            Label prob = new Label(addon + " * " + ma + " * " + vel + " =");
-            ans = new Label(answer);
+            Label form = new Label();
+            Label prob = new Label();
+            if (momentum.getText().equals("")) {
+                String answer = Calculations.relativisticMomentum(vector1.getText(),
+                        mass.getText()).toString();
+                String vel = vector1.getText();
+                String ma = mass.getText();
+                form.setText("p=" + GreekLetters.GAMMA + "mv");
+                prob.setText(ma + " * " + vel + " =");
+                ans = new Label(answer);
+            } else if (mass.getText().equals("")) {
+                String answer = Double.toString(Calculations.relativisticMass(vector1.getText(),
+                        momentum.getText()));
+                String vel = vector1.getText();
+                String mo = momentum.getText();
+                form.setText("m=p/" + GreekLetters.GAMMA + "v");
+                prob.setText(mo + " / " + vel + " =");
+                ans = new Label(answer);
+            } else if (vector1.getText().equals("")) {
+                String answer = Calculations.relativisticVelocity(momentum.getText(),
+                        mass.getText()).toString();
+                String mo = momentum.getText();
+                String ma = mass.getText();
+                form.setText(GreekLetters.GAMMA + "v=p/m");
+                prob.setText(mo + " * " + ma + " =");
+                ans = new Label(answer);
+            }
             UserInterface.data.getChildren().addAll(form, prob, ans);
         });
         UserInterface.data.getChildren().addAll(new Label("Relativistic Momentum"),
-                vector1, mass, calc);
+                vector1, mass, momentum, calc);
     }
 
     public static void nonrelativisticMomentum() {
@@ -150,21 +179,44 @@ public class CalcScenes {
         vector1.setPromptText("Velocity <x,y,z>");
         vector1.setOnMouseClicked(event -> pasteTo = vector1);
         TextField mass = new TextField();
-        mass.setPromptText("mass");
+        mass.setPromptText("mass(kg)");
         mass.setOnMouseClicked(event -> pasteTo = mass);
+        TextField momentum = new TextField();
+        momentum.setPromptText("momentum <x,y,z>");
+        momentum.setOnMouseClicked(event1 -> pasteTo = momentum);
         Button calc = new Button("CALCULATE");
         calc.setOnAction(event -> {
-            String answer = Calculations.nonrelativisticMomentum(vector1.getText(),
-                    mass.getText()).toString();
-            String vel = vector1.getText();
-            String ma = mass.getText();
-            Label form = new Label("p=mv");
-            Label prob = new Label(ma + " * " + vel + " =");
-            ans = new Label(answer);
+            Label form = new Label();
+            Label prob = new Label();
+            if (momentum.getText().equals("")) {
+                String answer = Calculations.nonrelativisticMomentum(vector1.getText(),
+                        mass.getText()).toString();
+                String vel = vector1.getText();
+                String ma = mass.getText();
+                form.setText("p=mv");
+                prob.setText(ma + " * " + vel + " =");
+                ans = new Label(answer);
+            } else if (mass.getText().equals("")) {
+                String answer = Double.toString(Calculations.nonrelativisticMass(vector1.getText(),
+                        momentum.getText()));
+                String vel = vector1.getText();
+                String mo = momentum.getText();
+                form.setText("m=p/v");
+                prob.setText(mo + " / " + vel + " =");
+                ans = new Label(answer);
+            } else if (vector1.getText().equals("")) {
+                String answer = Calculations.nonrelativisticVelocity(momentum.getText(),
+                        mass.getText()).toString();
+                String mo = momentum.getText();
+                String ma = mass.getText();
+                form.setText("v=p/m");
+                prob.setText(mo + " * " + ma + " =");
+                ans = new Label(answer);
+            }
             UserInterface.data.getChildren().addAll(form, prob, ans);
         });
         UserInterface.data.getChildren().addAll(new Label("Non-Relativistic Momentum"),
-                vector1, mass, calc);
+                vector1, mass, momentum, calc);
     }
 
     public static void impulseMomentum() {
@@ -173,21 +225,44 @@ public class CalcScenes {
         vector1.setPromptText("Net Force <x,y,z>");
         vector1.setOnMouseClicked(event -> pasteTo = vector1);
         TextField time = new TextField();
-        time.setPromptText(GreekLetters.DELTA + "time");
+        time.setPromptText(GreekLetters.DELTA + "time(s)");
         time.setOnMouseClicked(event -> pasteTo = time);
+        TextField momentum = new TextField();
+        momentum.setPromptText("Momentum <x,y,z>");
+        momentum.setOnMouseClicked(event -> pasteTo = momentum);
         Button calc = new Button("CALCULATE");
         calc.setOnAction(event -> {
-            String answer = Calculations.impulseMomentum(vector1.getText(),
-                    time.getText()).toString();
-            String fnet = vector1.getText();
-            String ti = time.getText();
-            Label form = new Label("p=F" + GreekLetters.DELTA + "t");
-            Label prob = new Label(fnet + " * " + ti + " =");
-            ans = new Label(answer);
+            Label form = new Label();
+            Label prob = new Label();
+            if (momentum.getText().equals("")) {
+                String answer = Calculations.impulseMomentum(vector1.getText(),
+                        time.getText()).toString();
+                String fnet = vector1.getText();
+                String ti = time.getText();
+                form.setText(GreekLetters.DELTA + "p=Fₙₔₜ" + GreekLetters.DELTA + "t");
+                prob.setText(fnet + " * " + ti + " =");
+                ans = new Label(answer);
+            } else if (time.getText().equals("")) {
+                String answer = Double.toString(Calculations.impulseTime(vector1.getText(),
+                        momentum.getText()));
+                String fnet = vector1.getText();
+                String mo = momentum.getText();
+                form.setText(GreekLetters.DELTA + "t=" + GreekLetters.DELTA + "p/Fₙₔₜ");
+                prob.setText(mo + " / " + fnet + " =");
+                ans = new Label(answer);
+            } else if (vector1.getText().equals("")) {
+                String answer = Calculations.impulseVelocity(momentum.getText(),
+                        time.getText()).toString();
+                String mo = momentum.getText();
+                String ti = time.getText();
+                form.setText("Fₙₔₜ=" + GreekLetters.DELTA + "p/" + GreekLetters.DELTA + "t");
+                prob.setText(mo + " * " + ti + " =");
+                ans = new Label(answer);
+            }
             UserInterface.data.getChildren().addAll(form, prob, ans);
         });
         UserInterface.data.getChildren().addAll(new Label("Impulse Momentum"),
-                vector1, time, calc);
+                vector1, time, momentum, calc);
     }
 
     public static void iterativeCalculation() {
@@ -214,6 +289,7 @@ public class CalcScenes {
 
     public static void icDistance() {
         UserInterface.data.getChildren().clear();
+
         UserInterface.data.getChildren().addAll(new Label("{iter calc dis}"));
     }
 
@@ -260,6 +336,7 @@ public class CalcScenes {
     }
 
     public static void copyData() {
+        if (ans == null) { return; }
         String data = ans.getText();
         UserInterface.copyItem.setText(data);
     }

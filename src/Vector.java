@@ -17,6 +17,7 @@ public class Vector {
 
     public Vector(double[] in) {
         data = in;
+        size = in.length;
     }
 
     public Vector add(Vector addon) throws VectorException {
